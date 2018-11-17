@@ -7,26 +7,41 @@
 
 import numpy as np
 import math
+import tsplib95 as tp
+
 
 def PreData(method):
-		with open('D:/Study/Jean Monnet/Advanced Algoirthm/Project/Data/gr666.tsp') as f:
-			num = 0 #city number
+
+	name = 'D:/Study/Jean Monnet/Advanced Algoirthm/Project/Data/gr21.tsp'
+	tsp = tp.load_problem(name)
+	num = tsp.dimension 
+	numJudge = num
+	temMat = []
+
+	disMat = np.zeros((num,num),dtype = np.float64)
+
+
+	if tsp.edge_weight_type == 'EXPLICIT':
+		for i in range(num):
+			for j in range(num):
+				disMat[i][j] = disMat[j][i] = tsp.wfunc(i,j)
+		return disMat,num;
+
+	else:
+		with open(name) as f:
+
 			find_num = False 
 			temMat = []
 			data = f.readlines()
-			numJudge = 0
-
 			for line in data:
 
 				stringJudge = []
-				line = line.rstrip('\n')
+				line = line.rstrip('\n') 
 				stringJudge = line.split()
-
-				if stringJudge[0] == 'DIMENSION:':	
-
-					numJudge = np.int(stringJudge[1])
+				typeDis = "" 
 
 				if find_num:	
+			
 					if numJudge:
 						string_data = line.split()
 						temMat.append(string_data)
@@ -35,44 +50,36 @@ def PreData(method):
 					else:
 						break
 
-					num = num + 1						
+				
 				if stringJudge[0] == "NODE_COORD_SECTION":
+					
 					find_num = True
 
 			corMat = np.array(temMat)
 			corMat = corMat.astype(np.float64)
 			corMat = corMat[:,1:3]
-
-			# 以下计算城市距离矩阵
-			disMat = np.zeros((num,num),dtype = np.float64) #初始化距离矩阵
 ##########################################################################
 			#EU_2D
 			if method == "eu":
 				for i in range(num):
 					for j in range(num):
-						#计算两个城市之间的欧式距离
 						if i != j:
 							xd = corMat[i][0]-corMat[j][0]
 							yd = corMat[i][1]-corMat[j][1]
 
-							# temDis = (int)(np.sqrt(np.float((xd*xd + yd*yd) ) ) + 0.5)
 							temDis = (int)(math.sqrt((xd*xd + yd*yd) ) + 0.5)
 
 							disMat[i][j] = disMat[j][i] = temDis
 
-##############################################################################
+	##############################################################################
 
-##############################################################################
+	##############################################################################
 			#GEO Distance
 			if method == "geo":
-				# Latitude is geoMat[:][0]
-				# longitude is geoMat[:][1]
-
 
 				geoMat = np.zeros((num,2),dtype = np.float64)
 				PI = np.float64(3.141592)
 				RRR = np.float64(6378.388)
-
 				for i in range(num):
 					x = corMat[i][0]
 					deg = (int)(x)
@@ -92,11 +99,4 @@ def PreData(method):
 							q3 = np.float( np.cos(geoMat[i][0] + geoMat[j][0]) )
 							disMat[i][j] = (np.int64)( RRR * np.arccos( 0.5 * ((1.0 + q1) * q2 
 								- (1.0 - q1) * q3) ) + 1.0 ) 
-
-##############################################################################
-
-			#距离矩阵保留两位小数
-			# disMat = np.around(disMat,decimals = 6)
-
-		# 其中 corMat 即为城市坐标矩阵，disMat 为城市距离矩阵，num-1 则为城市数目
-			return corMat,disMat,num;
+		return disMat,num;

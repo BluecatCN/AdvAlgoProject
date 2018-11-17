@@ -1,1 +1,7 @@
 This repository contains the implementation of different approaches/algorithms for solving Travelling Salesman Problem (TSP). Work is under progress.
+
+Comment for ExtractData.py
+  I just added one new method to deal with the "MATRIX" kind of data. This kind of data will provide data with triangular matrix. 
+And for that I use a python package called TSPlib95.
+  TSPlib95 installation is literally easy using just one command line. "pip install tsplib95" -- just make sure your pip version is the latest version.
+  For this new py document, you need to specify one parameter which is "eu",or "geo", correspond to different kind of distance calculation.
