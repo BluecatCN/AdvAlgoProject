@@ -52,8 +52,8 @@ def checkcity(nextcity, visited_mat):
 def printresult(route, distance, opt, TIME):
 	print("route: " + str(route))
 	print("total distance: " + str(distance))
-	print("Error persentage: "+str((distance/opt-1)*100))
-	print("time taken: " + str(time()-TIME))
+	print("Error persentage: "+str(round((distance/opt-1)*100,2)))
+	print("time taken: " + str(round(time()-TIME,2)))
 
 ##### main #####	
 filename = './dataset/burma14.tsp'
