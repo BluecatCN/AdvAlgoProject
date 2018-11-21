@@ -16,6 +16,7 @@ import numpy as np
 import math
 import random
 import sys
+from time import time
 
 from ExtractDataVer2 import PreData
 
@@ -48,18 +49,25 @@ def checkcity(nextcity, visited_mat):
 			return  0
 	return 1
 
+def printresult(route, distance, opt, TIME):
+	print("route: " + str(route))
+	print("total distance: " + str(distance))
+	print("Error persentage: "+str((distance/opt-1)*100))
+	print("time taken: " + str(time()-TIME))
+
 ##### main #####	
-filename = 'burma14.tsp'
+filename = './dataset/burma14.tsp'
+startTIME = time()
+optAns = 3323
 
 # initialization
 disMat = PreData(filename,"geo",2)	# matrix that shows city distance
 cityNum = PreData(filename,"geo",3)	# number of city total
 
-start = random.randrange(cityNum)	# starting city
 #random approach
+start = random.randrange(cityNum)	# starting city
 route = RandomApproach(start, disMat, cityNum)
-print("route: " + str(route[0]))
-print("total distance: " + str(route[1]))
+printresult(route[0],route[1],optAns,startTIME)
 
 '''
 # if you want to run them multiple time
@@ -77,6 +85,5 @@ while count < len(disMat)*1000*2:
 		finalDis = route[1]
 		finalRoute = route[0]
 	count += 1
-print("route: " + str(finalRoute) )
-print("total distance: " + str(finalDis))
+printresult(finalRoute, finalDis, optAns, startTIME)
 '''
