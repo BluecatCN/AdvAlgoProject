@@ -1,0 +1,109 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Date    : 2018-11-03 10:36:19
+# @Author  : mutudeh (josephmathone@gmail.com)
+# @Link    : ${link}
+# @Version : $Id$
+
+import numpy as np
+import ExtractData as ED
+import tspUtils as tu
+
+class tspDP:
+
+	def __init__(self,disMat,numC):
+		#注意，这里的 numC 已经包含了起始城市
+		self.disMat = disMat
+		self.numC = numC
+		# 初始化动规矩阵
+		#其长度为 2^n(number of set),宽度为 n (cities)
+		#初始化dp数组
+		self.inf = 9999
+
+		self.N_0 = -1
+
+		self.dp = np.full((self.Convert(),numC),self.inf)
+
+		for i in range(0,self.numC ):
+			self.dp[0][i] = disMat[0][i]
+
+		self.TraceBack = np.full((self.Convert(),numC),-1)
+		self.path = np.full((numC),-1)
+
+
+	def Convert(self):
+		# 进行集合的二进制转换
+		# 所有状态的集合一共为 2^n
+		return np.power(2,self.numC - 1)
+
+	def Algo(self):
+		#注意这里处理从第二个城市到最后一个城市这之间的距离
+		#从第二个城市进行处理是因为第一个城市为城市 0 
+		#因为 TSP 为一个环，所以最后还要处理从最后一个城市到 0
+
+		for i in range(1,self.Convert()):
+			#这里循环的是顶点的数目
+			for j in range(1,self.numC):
+				temMin = self.inf
+				#这里循环的是所有 在 set 中的顶点数目
+				for k in range(1,self.numC): # 在数据中，城市从 0 ~ N-1
+					#首先判定当前顶点是否在 set 中
+					tem = 1<<(k-1)
+					if (tem & i):
+						#表示当前搜寻的顶点存在于当前的集合i中
+						self.dp[i][j] = min(self.dp[i][j],self.dp[i-tem][k] + self.disMat[k][j])
+					
+					if self.dp[i][j] < temMin:
+						temMin = self.dp[i][j]
+						self.TraceBack[i][j] = k
+					# temDis = self.dp[i-tem][k] + self.disMat[k][j]
+					# if temDis < temMin:
+					# 	temMin = temDis
+					# 	self.dp[i][j] = temDis
+					# 	self.TraceBack[i][j] = k
+
+
+		# 处理 N-1 ~ 0 这段距离
+		temMin = self.inf
+		shortestPath = self.inf
+
+		for i in range(1,self.numC):
+			
+			shortestPath = min(shortestPath,self.dp[self.Convert() - 1][i] + self.disMat[i][0])
+			if shortestPath < temMin:
+				temMin = shortestPath
+				self.N_0 = i
+
+		return shortestPath,self.dp,self.TraceBack
+
+
+	def Printpath(self):
+
+		startingPoint = self.N_0
+		sets = self.Convert() -1
+		CountN = self.numC - 1
+		self.path[CountN] = self.N_0 + 1
+
+		while sets:
+
+			CountN = CountN - 1
+			sets = int(sets - np.power(2,startingPoint - 1))
+			self.path[CountN] = trace[sets][startingPoint]+1
+			startingPoint = int(trace[sets][startingPoint])
+
+
+		self.path[0] = 1
+		return self.path
+
+disMat,numC = ED.PreData('geo')
+# print(disMat)
+# disMat = disMat[0:10,0:10]
+# numC = 10
+DP = tspDP(disMat,numC)
+ans,dp,trace = DP.Algo()
+# np.savetxt("dp.txt",dp)
+# np.savetxt("trace.txt",trace)
+
+print(ans)
+path = DP.Printpath()
+print(path)
