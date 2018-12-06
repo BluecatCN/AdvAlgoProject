@@ -84,7 +84,9 @@ def PreData(name_city):
 				sumSqBEx = np.tile(sumSqB, (vecProd.shape[0], 1))    
 				SqED = sumSqBEx + sumSqAEx - 2*vecProd   
 				ED = (SqED.getA())**0.5
+				ED = ED + 0.5
 				ED = ED.astype(int)
+				disMat = np.asarray(ED)
 
 			if method == "CEIL_2D":
 				process = True
@@ -101,7 +103,25 @@ def PreData(name_city):
 				sumSqBEx = np.tile(sumSqB, (vecProd.shape[0], 1))    
 				SqED = sumSqBEx + sumSqAEx - 2*vecProd   
 				ED = (SqED.getA())**0.5
+				ED = ED + 0.5
 				ED = np.round(ED)
+				disMat = ED
+
+			# Pesudo_Eucildean distance == ATT				
+			if method == "ATT":
+				process = True
+				for i in range(num):
+					for j in range(num):
+						if i != j:
+							xd = corMat[i][0]-corMat[j][0]
+							yd = corMat[i][1]-corMat[j][1]
+							rij = (math.sqrt((xd*xd + yd*yd) /10.0) )
+							tij = (int)(rij + 0.5)
+							if tij <rij:
+								disMat[i][j] = disMat[j][i] = tij + 1
+							else:
+								disMat[i][j] = disMat[j][i] = tij
+
 	##############################################################################
 
 	##############################################################################
