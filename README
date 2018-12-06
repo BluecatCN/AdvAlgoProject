@@ -6,6 +6,12 @@ And for that I use a python package called TSPlib95.
   TSPlib95 installation is literally easy using just one command line. "pip install tsplib95" -- just make sure your pip version is the latest version.
   For this new py document, you need to specify one parameter which is "eu",or "geo", correspond to different kind of distance calculation.
 
+Reminder:
+  For the new version of extractdata, it will take the absolute path name of each dataset as input and out distance matrix and number of cities.
+  For the file "test_for_all_data", it combines the absolute path name of dataset with each dataset's name in the cities.txt
+
+
+
 All dataset names of the whole TSP dataset
 a280,ali535,att48,att532,bayg29,bays29,berlin52,bier127,brazil58,brd14051,brg180,burma14,ch130,ch150,d198,d493,d657,d1291,d1655,d2103,d15112,d18512,
 dantzig42,dsj1000,eil51,eil76,eil101,fl417,fl1400,fl1577,fl3795,fnl4461,fri26,gil262,gr17,gr21,gr24,gr48,gr96,gr120,gr137,gr202,gr229,
