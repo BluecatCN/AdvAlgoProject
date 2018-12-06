@@ -8,6 +8,8 @@ And for that I use a python package called TSPlib95.
 
 Reminder:
   For the new version of extractdata, it will take the absolute path name of each dataset as input and out distance matrix and number of cities.
+    - new version change the way to compute the EUC_2D, from scaler way to matrix way, which is much faster
+    - the new dataset is removed two dataset pla85900 and pla33810 who are too big and python shows memoryerror and we will come to it later
   For the file "test_for_all_data", it combines the absolute path name of dataset with each dataset's name in the cities.txt
 
 
