@@ -56,9 +56,13 @@ def printresult(route, distance, opt, TIME):
 	print("time taken: " + str(round(time()-TIME,2)))
 
 ##### main #####	
-filename = './dataset/burma14.tsp'
 startTIME = time()
-optAns = 3323
+#filename = './dataset/burma14.tsp'
+#optAns = 3323
+#filename = './dataset/berlin52.tsp'
+#optAns = 7542
+filename = './dataset/kroA100.tsp'
+optAns = 21282
 
 # initialization
 disMat = PreData(filename,"geo",2)	# matrix that shows city distance
