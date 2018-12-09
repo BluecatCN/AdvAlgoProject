@@ -1,0 +1,84 @@
+# coding:utf-8
+
+#老王的提取数据py得到的是城市矩阵，距离矩阵和城市数目
+#需要方法来处理城市矩阵和距离矩阵，分别得到城市路径和优化后距离
+#先实现prim处理生成MST
+
+import numpy as np
+import math
+import time
+#import Getdata2
+#from Getdata2 import PreData
+import Extrac_test_data
+from Extrac_test_data import PreData
+
+def Prim(disMat,vNum):
+
+    prims = []
+    weights = []  #存放预设值
+    pathw = []  #存放找出来mst路径权值
+    #weights[0] =10000 #给w[0]先赋一个最大值，下面循环里找出来最小的权值，再赋给w[0]
+    cover_node = [False] * vNum
+    min = float("inf")
+
+    node =0
+    cover_node[node] = True  # 已经找到的点，所以不再考虑
+    for i in range(vNum):
+        prims.append(0)   #此方法用于在列表末尾添加新的对象。
+        weights.append(0)
+
+
+    for i in range(1,vNum):
+        weights[i] = disMat[node][i]  #先提取邻接矩阵里node=0代表的第一行每个点的edge权值，作为初始值
+
+
+    for i in range(vNum-1):  #i变化一次，找出一个最优点. vNum-1是因为若i进行vNum次遍历，则会把最后一个prims[]因为里面not cover_node[]而重复倒数第二个
+        min_value = float("inf")
+        for j in range(vNum):
+            if weights[j] != min_value and weights[j]<min_value and not cover_node[j]:   #cover_node[j]使不再考虑disMat[j]的点
+                min_value = weights[j]
+                #pathw[i]=weights[j] #把遍历的点从0开始在weights[]里排起
+                node = j
+        if node != 0 :
+            cover_node[node] = True
+        for m in range(vNum):
+            if weights[m] > disMat[node][m] and not cover_node[m]:  #处理上面遍历一列j后得到的最小j，此j对应的那一行
+            #if weights[i] >= disMat[node][m]:
+                weights[m] = disMat[node][m]  #得到node这一行中除了[node][node]和[node][0]这两点外最小的权值
+
+            else: ()
+            prims[i] = node        #把找到的node值赋给prims[0],第一个node值也就是树的起始节点
+
+        weights[0]=disMat[0][prims[0]] #weights[0]最初被node=0直接吃了，这里在最后要特意加上
+    return weights, prims
+
+
+
+#####main### C:\Users\roven\PycharmProjects\TSP_MSTAlgo
+
+def main():
+
+    start_time=time.time()  #获取开始时间
+    weights,prims=Prim(disMat,vNum)
+    print(weights)
+    print(prims)
+    end_time=time.time()  #获取结束时间
+    return end_time - start_time
+
+
+if __name__=='__main__':
+    filename = 'd657.tsp'
+    disMat, vNum = PreData(filename)
+    start_time = time.time()
+    weights,prims = Prim(disMat,vNum)
+    wtotal=sum(weights)
+    print(weights)
+    print(prims)
+    print(wtotal)
+    end_time = time.time()
+    print(start_time)
+    print(end_time)
+    print(end_time - start_time)
+
+
+
