@@ -1,9 +1,5 @@
 # coding:utf-8
 
-#老王的提取数据py得到的是城市矩阵，距离矩阵和城市数目
-#需要方法来处理城市矩阵和距离矩阵，分别得到城市路径和优化后距离
-#先实现prim处理生成MST
-
 import numpy as np
 import math
 import time
