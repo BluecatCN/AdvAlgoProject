@@ -1,194 +1,138 @@
 # coding:utf-8
-#关于二叉树的部分，应该是左边放理论上属于tour的edge，右边放新找到的，理论认为不属于tour的。
-# 左右结点大小比较，若右边的比较小，则右边的换到左边来，再把右边先变成无限大（某种意义上的删除），再用新找到的来覆盖
-#根节点设置为0，这样得出树之后，根节点不影响计算所有节点之和
-#左子节点先放25，然后和[1][2]的matsum值比较大小。
-#应该有一个独立数组用来记录左子节点的内容，既其代表edge的两个端点
-
 
 import numpy as np
 import math
 import time
-#import Extrac_test_data
-#from Extrac_test_data import PreData
 import Extrac_test_data
 from Extrac_test_data import PreData
 import sys
 
 def BandB(disMat,vNum,cover_node,i,n,upper,lowb):   #n:row.i:column. default: n=0,i=0,tot=0,upper=infinite
 
-    tot = calculatentot(n)
-    if (tot == 2 and i != 0) or i >= (vNum):  # tot是当前递归层里已经访问了几个必须的点
-        n = n + 1
-        i=n
-
-    if n>=i and n<(vNum-1):
-        i=n+1
-        #print("i>n",i)
-    toti = calculatentot(i)
-    if toti == 2 and i<(vNum-1):
-        i = i + 1
-        #print("i",i)
-        if i>=(vNum):
+        tot = calculatentot(n)
+        if (tot == 2 and i != 0) or i >= (vNum):  # if this row already had 2 elements been visited, visit next row
             n = n + 1
-            i = n+1
+            i=n
 
-    if n >= (vNum-1):  # or lowb==upper: #因为这个算法到第vNum-1点tot=2,且第vNum点tot=1时就可以停止了
-        disMat[0][0]=lowb
-        return None
+        if n>=i and n<(vNum-1):
+            i=n+1
 
-    cover_node[n][i]=1
-    cover_node[i][n]=1
-    lowl=calculatebound(cover_node)  #找左节点的bound
+        toti = calculatentot(i)
+        if toti == 2 and i<(vNum-1):  #if this element already visited 2 times, visit the next
+            i = i + 1
+            if i>=(vNum):
+                n = n + 1
+                i = n+1
 
-    cover_node[n][i]=-1
-    cover_node[i][n]=-1
-    lowr=calculatebound(cover_node)  #找右结点的bound
+        if n >= (vNum-1):  # or lowb==upper: #因为这个算法到第vNum-1点tot=2,且第vNum点tot=1时就可以停止了
+            disMat[0][0]=lowb
+            return None
 
-    diameter = min(disMat[n])
+        cover_node[n][i]=1
+        cover_node[i][n]=1
+        lowl=calculatebound(cover_node)  #find the left node's bound
 
-    if lowl<=lowr and (lowr-lowl)<diameter :
-            upper=lowr  #把较大的结点的bound赋给upper bound
-            lowb=lowl
-            cover_node[0][0]=lowb
-            cover_node[n][i] = 1
-            cover_node[i][n] = 1
+        cover_node[n][i]=-1
+        cover_node[i][n]=-1
+        lowr=calculatebound(cover_node)  #find the right node's bound
 
-    else:
-        if  (lowl-lowr)<diameter and (upper-lowb)<diameter :
-            upper=lowr  #把较大的结点的bound赋给upper bound
-            lowb=lowl
-            cover_node[0][0]=lowb
-            cover_node[n][i] = 1
-            cover_node[i][n] = 1
+        diameter = min(disMat[n])
+
+        if lowl<=lowr and (lowr-lowl)<diameter :
+                upper=lowr  #give bigger bound to upper
+                lowb=lowl
+                cover_node[0][0]=lowb
+                cover_node[n][i] = 1
+                cover_node[i][n] = 1
 
         else:
-            upper = lowl
-            lowb = lowr
-            cover_node[0][0] = lowb
-            cover_node[n][i] = -1
-            cover_node[i][n] = -1
-    #print(cover_node)
-    BandB(disMat, vNum, cover_node, i+1, n, upper, lowb)
+            if  (lowl-lowr)<diameter and (upper-lowb)<diameter :   #distance gap
+                upper=lowr
+                lowb=lowl
+                cover_node[0][0]=lowb
+                cover_node[n][i] = 1
+                cover_node[i][n] = 1
+
+            else:
+                upper = lowl
+                lowb = lowr
+                cover_node[0][0] = lowb
+                cover_node[n][i] = -1
+                cover_node[i][n] = -1
+        BandB(disMat, vNum, cover_node, i+1, n, upper, lowb)
 
 def calculatentot(n):
-    k=0
-    for i in range(0,vNum):
-        if cover_node[n][i]==1:
-            k=k+1
-    return k
+        k=0
+        for i in range(0,vNum):
+            if cover_node[n][i]==1:
+                k=k+1
+        return k
 
 def calculatebound(cover_node):
-    lowbound=0
-    for i in range (0,vNum):
-        rowmin = disMat[i].copy()
-        rowmin.sort()  # 对得到的数列进行排序
-        for j in range (0,vNum):
-            if i!=j:
-                if cover_node[i][j]==1 and disMat[i][j] != rowmin[0] and disMat[i][j] != rowmin[1]:
-                    rowmin[1]=rowmin[0]
-                    rowmin[0]=disMat[i][j]
-                if cover_node[i][j]==-1 and disMat[i][j]==rowmin[0]:
-                    for k in range(0,vNum-1):
-                        rowmin[k]=rowmin[k+1]
-                if cover_node[i][j] == -1 and disMat[i][j] == rowmin[1]:
-                    for k in range(1,vNum-1):
-                        rowmin[k]=rowmin[k+1]
+        lowbound=0
+        for i in range (0,vNum):
+            rowmin = disMat[i].copy()
+            rowmin.sort()  # Ranking the value of array elements
+            for j in range (0,vNum):
+                if i!=j:
+                    if cover_node[i][j]==1 and disMat[i][j] != rowmin[0] and disMat[i][j] != rowmin[1]:
+                        rowmin[1]=rowmin[0]
+                        rowmin[0]=disMat[i][j]
+                    if cover_node[i][j]==-1 and disMat[i][j]==rowmin[0]:
+                        for k in range(0,vNum-1):
+                            rowmin[k]=rowmin[k+1]
+                    if cover_node[i][j] == -1 and disMat[i][j] == rowmin[1]:
+                        for k in range(1,vNum-1):
+                            rowmin[k]=rowmin[k+1]
 
-        lowbound = lowbound + rowmin[0] + rowmin[1]
+            lowbound = lowbound + rowmin[0] + rowmin[1]
 
-    lowbound = lowbound / 2
-    return lowbound
-
-def examcalculate(disMat,vNum):
-    lowbound=0
-    for i in range (vNum-1):
-        rowmin = disMat[i].copy()
-        rowmin.sort() #对得到的数列进行排序
-        lowbound = lowbound + rowmin[0] + rowmin[1]
-    lowbound = lowbound / 2
-    print("检测最原始的cost",lowbound)
-
-def gettour(cover_node):
-    s=0  #记录第一个点,和接下来的点
-    tour=[0]
-    #print(s)
-    #print(tour)
-    for i in range(0,vNum):
-        print("检查最外层循环i",i)
-        for j in range(0,vNum):
-            n=0
-            for k in range (0,vNum):
-                if cover_node[j][k]==1:
-                    n=n+1
-                if cover_node[s][k]==1: #or cover_node[k][s]==1:
-                    tour[i]=k
-                    print("检查赋值是否成功",tour[i])
-                    break_flag=True
-                    break  #此处是想跳出本次i,j,k的循环
-            if n==1:
-                tour[i]=j
-                s=j
-
-            if break_flag==True:
-                break
-        if break_flag==True:
-            break
-    #if break_flag==True:
-     #   break
-    print("检查返回tour变化",tour)
-    return tour
+        lowbound = lowbound / 2
+        return lowbound
 
 def firsthandledisMat(disMat,vNum):
-    for i in range (0,vNum):
-        for j in range (0,vNum):
-            if i==j:
-                disMat[i][j]=100000000
-    return disMat
+        for i in range (0,vNum):
+            for j in range (0,vNum):
+                if i==j:
+                    disMat[i][j]=100000000
+        return disMat
 
 def diameterMat(disMat):
-    d=0
-    for i in range (vNum):
-        for j in range (vNum):
-            if disMat[i][j]>d:
-                d=disMat[i][j]
-    return d
+        d=0
+        for i in range (vNum):
+            for j in range (vNum):
+                if disMat[i][j]>d:
+                    d=disMat[i][j]
+        return d
 
 
-#####main### C:\Users\roven\PycharmProjects\TSP_MSTAlgo
+    #####main### C:\Users\roven\PycharmProjects\TSP_MSTAlgo
 
 def main():
 
-    start_time=time.time()  #获取开始时间
-    end_time=time.time()  #获取结束时间
-    return end_time - start_time
+        start_time=time.time()
+        end_time=time.time()
+        return end_time - start_time
 
 if __name__=='__main__':
 
-    start_time = time.time()
-    sys.setrecursionlimit(5000)
-    filename = 'st70.tsp'
-    tour=[]
-    disMat,vNum = PreData(filename)	# 获取城市距离邻接矩阵
-    #vNum = len(disMat[0])	# 获取城市数目
-    disMat=firsthandledisMat(disMat,vNum)
-    print("检查dis是否成功处理点到其自身距离",disMat)
-    cover_node = [[0 for j in range (0,vNum)] for i in range (0,vNum)]  # 定义系统变量，来记录必须或者不要访问的点
-    upper=float("inf")
-    lowb=0
-    n=0
-    i=0
-    tot=0
-    weights=examcalculate(disMat,vNum)  #测试原始cost
-    print(weights)
-    cover_node=BandB(disMat,vNum,cover_node, i, n, upper,lowb)
-    #tour=gettour(cover_node)
-    #print(cover_node)
-    #if cover_node[0][0]!=None:
-    weights=disMat[0][0]   #正确的处理方法
-    print(weights)
-    #print(tour)
-    end_time = time.time()
-    print(start_time)
-    print(end_time)
-    print(end_time - start_time)
+        start_time = time.time()
+        sys.setrecursionlimit(10000)  #make recursion's step limitation bigger
+        filename = 'ulysses16.tsp'
+        disMat,vNum = PreData(filename)	# get data
+        disMat=firsthandledisMat(disMat,vNum)
+        cover_node = [[0 for j in range (0,vNum)] for i in range (0,vNum)]  #record the statement of elements
+        upper=float("inf")
+        lowb=0
+        n=0
+        i=0
+        tot=0
+        BandB(disMat,vNum,cover_node, i, n, upper,lowb)
+        weights=disMat[0][0]   #正确的处理方法
+        print("weights list:", weights)
+        print("path:", prims)
+        print("total weight:", wtotal)
+        end_time = time.time()
+        print("time:", end_time - start_time)
+
+
